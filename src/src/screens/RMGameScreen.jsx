@@ -3,10 +3,14 @@ import { Image, View } from "react-native";
 import { Button, Text } from "react-native-paper";
 import { styles } from "../utils/styles";
 
+
+const Resp = "";
+
 export default function RMGameScreen() {
   const [personagem, setPersonagem] = useState(null);
   const [personagens, setPersonagens] = useState([]);
   const [totalPersonagens, setTotalPersonagens] = useState(1);
+  const [resp, setResp] = useState("");
 
   useEffect(() => {
     fetch("https://rickandmortyapi.com/api/character")
@@ -31,9 +35,9 @@ export default function RMGameScreen() {
   async function handlePersonagemVivoOuMorto(resposta) {
     const isAlive = personagem.status === "Alive";
     if (resposta === isAlive) {
-      alert("Você acertou!");
+      setResp("Acertou !");
     } else {
-      alert("Você errou!");
+      setResp("Errou !");
     }
     buscarPersonagem();
   }
@@ -50,63 +54,75 @@ export default function RMGameScreen() {
 
   return (
     <View style={styles.container}>
-      <View
-        style={{
-          border: "2px solid black",
-          alignItems: "Center",
-          padding: 15,
-          borderRadius: 10,
-        }}
-      >
-        <Text style={styles.title}>Rick and Morty Game</Text>
-        <Text style={styles.subtitle}>
-          Você sabe se o personagem está vivo?
-        </Text>
-        {personagem && (
-          <View>
-            <View
-              style={{
-                alignItems: "center",
-                justifyContent: "center",
-                textAlign: "center",
-              }}
+      <View style={{ border: "2px solid black", alignItems: "Center", padding: 15, borderRadius: 10}}>
+      <Text style={styles}>Rick - Morty Game</Text>
+      <Text style={styles}>Você sabe se o personagem está vivo?</Text>
+      {personagem && (
+        <View>
+          <Image
+            source={{ uri: personagem.image }}
+            style={{ width: 200, height: 200 }}
+          />
+          <Text
+            style={{ fontSize: 32, textAlign: "center", marginVertical: 20 }}
+          >
+            O/a personagem {personagem.name} está vivo/a?
+          </Text>
+          <View style={{ flexDirection: "row", gap: 20 }}>
+            <Button
+              mode="contained"
+              onPress={() => handlePersonagemVivoOuMorto(true)}
             >
-              <Image
-                source={{ uri: personagem.image }}
-                style={{ width: 200, height: 200, marginTop: 20 }}
-              />
-            </View>
-            <Text
-              style={{ fontSize: 25, textAlign: "center", marginVertical: 20 }}
+              SIM
+            </Button>
+            <Button
+              mode="contained"
+              onPress={() => handlePersonagemVivoOuMorto(false)}
             >
-              O/a personagem {personagem.name} está vivo/a/e?
-            </Text>
-            <View
-              style={{
-                alignItems: "center",
-                flexDirection: "row",
-                justifyContent: "center",
-                textAlign: "center",
-              }}
-            >
-              <View style={{ alignItems: "center", marginRight: 20 }}>
-                <Button
-                  mode="contained"
-                  onPress={() => handlePersonagemVivoOuMorto(true)}
-                >
-                  SIM
-                </Button>
-              </View>
-              <Button
-                mode="contained"
-                onPress={() => handlePersonagemVivoOuMorto(false)}
-              >
-                NÃO
-              </Button>
-            </View>
+              NÃO
+            </Button>
+            <Text style={{ fontSize: 48 }}>{resp}</Text>
           </View>
-        )}
+        </View>
+      )}
       </View>
     </View>
   );
 }
+
+const storeData = async (value) => {
+  try {
+    await AsyncStorage.setItem("@storage_Key", value);
+  } catch (e) {
+    // saving error
+  }
+};
+
+const storeData1 = async (value) => {
+  try {
+    const jsonValue = JSON.stringify(value);
+    await AsyncStorage.setItem("@storage_Key", jsonValue);
+  } catch (e) {
+    // saving error
+  }
+};
+
+const getData = async () => {
+  try {
+    const value = await AsyncStorage.getItem("@storage_Key");
+    if (value !== null) {
+      // value previously stored
+    }
+  } catch (e) {
+    // error reading value
+  }
+};
+
+const getData2 = async () => {
+  try {
+    const jsonValue = await AsyncStorage.getItem("@storage_Key");
+    return jsonValue != null ? JSON.parse(jsonValue) : null;
+  } catch (e) {
+    // error reading value
+  }
+};
